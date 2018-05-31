@@ -5,6 +5,7 @@
 #include <sstream>
 #include <thread>
 
+#include <vector>
 #include <istream> 
 #include <iostream>
 #include <stdint.h>
@@ -23,6 +24,7 @@
 
 void receive(Message &msg);
 void crack_(Message &msg);
+void crack__(Message &msg, unsigned int index);
 void send(Message &msg);
 
 int main(){
@@ -74,6 +76,7 @@ void receive(Message &msg){
 	printf("cruzid: %s\n", msg.cruzid);
 	printf("hostname: %s\n", msg.hostname);
 	printf("port: %d\n", msg.port);
+	printf("num_passwds: %d\n", ntohs(msg.num_passwds));
 
 	//}
 	
@@ -81,15 +84,50 @@ void receive(Message &msg){
 
 }
 
-void crack_(Message &msg){
-	//printf("Num Passwords: %d\n", ntohs(msg.num_passwds));
-	printf("CRACK\n");
-	printf("Hash: %s\n", (msg.passwds[0]));
+void crack__(Message &msg, unsigned int index){
+
+	printf("Hash: %s\n", (msg.passwds[index]));
 	//printf("Copy pasted hash: xxo0q4QVK0mOg\n");
 	char plain[8];
-	crack(msg.passwds[0], plain);
-	strcpy(msg.passwds[0], plain);
-	printf("Plaintext: %s\n", msg.passwds[0]);
+	crack(msg.passwds[index], plain);
+	strcpy(msg.passwds[index], plain);
+	printf("Plaintext: %s\n", msg.passwds[index]);
+
+}
+
+void crack_(Message &msg){
+	//printf("Num Passwords: %d\n", ntohs(msg.num_passwds));
+	unsigned int local_num_passwds = ntohs(msg.num_passwds);
+	std::vector<std::thread> threads;
+	unsigned int threadcount = 0;
+	unsigned int myCores = 24;
+
+	for(unsigned int i = 0; i < local_num_passwds; i++){
+
+		if(threads.size() < myCores)
+		{
+
+		printf("Starting thread %d\n", i);
+		threads.push_back(std::thread(crack__, std::ref(msg), i));
+		threadcount++;
+
+		}
+		if(threads.size() == myCores || threadcount == local_num_passwds)
+		{
+			for(unsigned int i = 0; i < local_num_passwds; i++)
+			{
+				threads.back().join();
+				threads.pop_back();
+			}
+		}
+
+		// printf("Hash: %s\n", (msg.passwds[i]));
+		// //printf("Copy pasted hash: xxo0q4QVK0mOg\n");
+		// char plain[8];
+		// crack(msg.passwds[i], plain);
+		// strcpy(msg.passwds[i], plain);
+		// printf("Plaintext: %s\n", msg.passwds[i]);
+	}
 }
 
 void send(Message &msg){
