@@ -18,6 +18,8 @@
  * Numeric elements should be converted to network byte-order before transmission
  * and converted back to host byte-order on receipt.
  */
+
+
 typedef struct message_t {
     char cruzid[MAX_CRUZID_LEN];             // Who this datagram is for
     char passwds[MAX_HASHES][HASH_LENGTH+1]; // NUM_PASSWD plain text passwords or password hashes

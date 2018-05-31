@@ -19,7 +19,7 @@ server: src/server.cc crack.o
 	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
-	@rm crack
+	@rm hacker server
 
 submit: clean 
 	@tar czvf ~/CMPS109-Lab9.tar.gz \
