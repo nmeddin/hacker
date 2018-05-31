@@ -19,6 +19,7 @@
 int main(int argc, char *argv[])
 {
 
+	//TODO: Refactor this
 	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sockfd < 0){
 		printf("open error\n");
@@ -40,8 +41,10 @@ int main(int argc, char *argv[])
 //i can convert vector to char[]
 	//once i have a vector copyinf the characters is easy to code
 
-	//msg.cruzid = htonl("nmeddin");
-	//char cruzid[MAX_CRUZID_LEN] = {'n', 'm', 'e', 'd',  'd', 'i', 'n', '\0'};
+	//make it parallere
+	// each threads solves a password
+	// each threads works on a subspace
+	// one threads finds, multicasst DONE signal, al lmachines move on to next password
 
 	char cruzid[] = "nmeddin";
 	strcpy (msg.cruzid, cruzid);
@@ -51,27 +54,6 @@ int main(int argc, char *argv[])
 	char hostname[] = "localhost";
 	strcpy(msg.hostname, hostname);
 	msg.port = 1200;
-
-
-
-	// msg.passwds[0][0] = ('x');
-	// msg.passwds[0][1] = ('x');
-	// msg.passwds[0][2] = ('o');
-	// msg.passwds[0][3] = ('0');
-	// msg.passwds[0][4] = ('q');
-	// msg.passwds[0][5] = ('4');
-	// msg.passwds[0][6] = ('Q');
-	// msg.passwds[0][7] = ('V');
-	// msg.passwds[0][8] = ('K');
-	// msg.passwds[0][9] = ('0');
-	// msg.passwds[0][10] = ('m');
-	// msg.passwds[0][11] = ('O');
-	// msg.passwds[0][12] = ('g');
-	// msg.passwds[0][13] = ('\0');
-	// char* hash1 = "xxo0q4QVK0mOg";
-	// msg.passwds[0] = hash1;
-
-	//msg.hostname = htonl("localhost");
 
 	//once i get the \0 i go to the next
 

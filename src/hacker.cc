@@ -32,12 +32,12 @@ int main(){
 	// receive(&msg)
 	// crack(&msg)
 	// send(&msg)
-	printf("HELLO WORLD\n");
+	//printf("HELLO WORLD\n");
 
 	Message msg;
 
 	while(true){
-		printf("hello\n");
+		//printf("hello\n");
 		receive(msg);
 		//reciveces from multi
 		crack_(msg);
