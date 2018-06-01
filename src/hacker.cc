@@ -96,7 +96,7 @@ void crack__(Message &msg, unsigned int index){
 }
 
 void crack_(Message &msg){
-	//printf("Num Passwords: %d\n", ntohs(msg.num_passwds));
+	printf("Num Passwords: %d\n", ntohs(msg.num_passwds));
 	unsigned int local_num_passwds = ntohs(msg.num_passwds);
 	std::vector<std::thread> threads;
 	unsigned int threadcount = 0;
@@ -104,14 +104,14 @@ void crack_(Message &msg){
 
 	for(unsigned int i = 0; i < local_num_passwds; i++){
 
-		if(threads.size() < myCores)
-		{
+		// if(threads.size() < myCores)
+		// {
 
 		printf("Starting thread %d\n", i);
 		threads.push_back(std::thread(crack__, std::ref(msg), i));
 		threadcount++;
 
-		}
+		// }
 		if(threads.size() == myCores || threadcount == local_num_passwds)
 		{
 			for(unsigned int i = 0; i < local_num_passwds; i++)

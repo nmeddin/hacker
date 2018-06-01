@@ -49,13 +49,13 @@ int main(int argc, char *argv[])
 	char cruzid[] = "nmeddin";
 	strcpy (msg.cruzid, cruzid);
 	char cmpsHash[] = "xxo0q4QVK0mOg";
-	for(unsigned int i = 0; i < 24; i++){
+	for(unsigned int i = 0; i < 12; i++){
 
 		printf("Putting hash into msg.passwds[%d]\n", i);
 		strcpy(msg.passwds[i], cmpsHash);
 
 	}
-	msg.num_passwds = htons(24);
+	msg.num_passwds = htons(12);
 	char hostname[] = "localhost";
 	strcpy(msg.hostname, hostname);
 	msg.port = 1200;
