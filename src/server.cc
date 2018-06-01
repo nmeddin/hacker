@@ -15,6 +15,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <functional>
+#include <vector>
 
 int main(int argc, char *argv[])
 {
@@ -37,6 +39,7 @@ int main(int argc, char *argv[])
 	multicastAddr.sin_port = htons(get_multicast_port());
 
 	Message msg;
+	msg.num_passwds = 0;
 
 //i can convert vector to char[]
 	//once i have a vector copyinf the characters is easy to code
@@ -48,17 +51,27 @@ int main(int argc, char *argv[])
 
 	char cruzid[] = "nmeddin";
 	strcpy (msg.cruzid, cruzid);
-	char cmpsHash[] = "xxo0q4QVK0mOg";
-	for(unsigned int i = 0; i < 12; i++){
+	// char cmpsHash[] = "xxo0q4QVK0mOg";
 
-		printf("Putting hash into msg.passwds[%d]\n", i);
-		strcpy(msg.passwds[i], cmpsHash);
+	std::vector<std::string> hashes;
+
+	hashes.push_back("abu.aRzZyCaeM");
+
+	hashes.push_back("abs7sc5/hi91o");
+
+	//char hashes[MAX_HASH_LENGTH][MAX_HASH_LENGTH+1]
+	for(std::string hash : hashes){
+
+		const char * chash = hash.c_str();
+
+		printf("Putting %s into msg.passwds\n", chash);
+
+		strcpy(msg.passwds[msg.num_passwds++], chash);
 
 	}
-	msg.num_passwds = htons(12);
-	char hostname[] = "localhost";
-	strcpy(msg.hostname, hostname);
-	msg.port = 1200;
+	msg.num_passwds = htonl(msg.num_passwds);
+	strcpy(msg.hostname, "thor");
+	msg.port = htons(1201);
 
 	//once i get the \0 i go to the next
 
@@ -66,20 +79,20 @@ int main(int argc, char *argv[])
 	// i recieve it and send it back with TCP protocol where i need a hostname
 
 	//for (;;) {
-		printf("Sending msg for: %s\n", "nmeddin");
-		int n = sendto(sockfd,(void *)&msg, sizeof(msg), 0, (struct sockaddr *) &multicastAddr, sizeof(multicastAddr));
-		if (n < 0){
-			printf("Write error\n");
-			exit(-1);
-		}
-		sleep(1);
+	printf("Sending msg for: %s\n", "nmeddin");
+	int n = sendto(sockfd,(void *)&msg, sizeof(msg), 0, (struct sockaddr *) &multicastAddr, sizeof(multicastAddr));
+	if (n < 0){
+		printf("Write error\n");
+		exit(-1);
+	}
+	sleep(1);
 	//}
 
 	close(sockfd);
 
 
 	//TCP Receive
-
+	
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) exit(-1);
 
@@ -106,11 +119,16 @@ int main(int argc, char *argv[])
 	int newsockfd = accept(sockfd, (struct sockaddr*) &client_addr, &len);
 	if(newsockfd < 0) exit(-1);
 
+	printf("Awaiting plaintext\n");
+
 	int tcp_n = recv(newsockfd, (void*)&msg, sizeof(msg), 0);
 	printf("Bytes read: %d\n", tcp_n);
 
-	printf("Received plaintext: %s\n", msg.passwds[0]);
+	for(unsigned int i = 0; i < ntohs(msg.num_passwds); i++){
+		printf("Received plaintext: %s\n", msg.passwds[i]);
+	}
 
 
 	close(sockfd);
+	close(newsockfd);
 }

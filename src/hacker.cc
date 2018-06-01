@@ -18,6 +18,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <functional>
+
 
 
 // create a class hacker and start threads for server and client
@@ -65,17 +67,17 @@ void receive(Message &msg){
 
 	//for(;;){
 
-		int n = recvfrom(sockfd, (void *)&msg, sizeof(msg), 0,NULL,0);
+	int n = recvfrom(sockfd, (void *)&msg, sizeof(msg), 0,NULL,0);
 
-		if (n < 0){
-			printf("Read error\n");
-			exit(-1);
-		}
-		
+	if (n < 0){
+		printf("Read error\n");
+		exit(-1);
+	}
+	
 
 	printf("cruzid: %s\n", msg.cruzid);
 	printf("hostname: %s\n", msg.hostname);
-	printf("port: %d\n", msg.port);
+	printf("port: %d\n", ntohs(msg.port));
 	printf("num_passwds: %d\n", ntohs(msg.num_passwds));
 
 	//}
@@ -91,12 +93,11 @@ void crack__(Message &msg, unsigned int index){
 	char plain[8];
 	crack(msg.passwds[index], plain);
 	strcpy(msg.passwds[index], plain);
-	printf("Plaintext: %s\n", msg.passwds[index]);
+	printf("Plaintext %d: %s\n", index, msg.passwds[index]);
 
 }
 
 void crack_(Message &msg){
-	printf("Num Passwords: %d\n", ntohs(msg.num_passwds));
 	unsigned int local_num_passwds = ntohs(msg.num_passwds);
 	std::vector<std::thread> threads;
 	unsigned int threadcount = 0;
@@ -144,15 +145,18 @@ void send(Message &msg){
     bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
 
     serv_addr.sin_port = (msg.port);
-    printf("Sending to host: %d\n", msg.port);
+    printf("Sending to port: %d\n", ntohs(msg.port));
 
-	if (connect(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) exit(-1);
-
+	if (connect(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
+		printf("Connect error\n");
+		exit(-1);
+	}
 
 
 	write(sockfd, (void*)&msg, sizeof(msg));
+	
 
-
+	close(sockfd);
 }
 
 void socket_setup(int &sockfd, struct sockaddr_in &server_addr, struct ip_mreq &multicastRequest) {
